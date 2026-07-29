@@ -1,46 +1,64 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>INERTIA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{
-      margin:0;
-      background:#0b1220;
-      color:white;
-      font-family:Arial,sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-    }
-
-    h1{
-      font-size:48px;
-      color:#37d5ff;
-    }
-
-    p{
-      text-align:center;
-      color:#bbb;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>INERTIA</title>
+<style>
+:root{--bg:#07101c;--panel:#0d1a2a;--text:#f4f8fb;--muted:#9fb0c2;--cyan:#38d3ff;--green:#59e39b;--red:#ff6f7d;--blue:#5c8dff;--goal:#f7d56b;--border:rgba(255,255,255,.10)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 8%,rgba(56,211,255,.10),transparent 28%),linear-gradient(180deg,#07101c,#040810 88%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{display:flex;justify-content:center}.app{width:min(100%,520px);padding:18px 16px calc(24px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;margin-bottom:14px}.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;border-radius:14px;border:1px solid rgba(56,211,255,.42);display:grid;place-items:center;background:linear-gradient(145deg,rgba(56,211,255,.15),rgba(92,141,255,.10))}
+h1{margin:0;font-size:25px;letter-spacing:.2em}.tag{font-size:11px;color:var(--muted);letter-spacing:.11em;margin-top:3px}.card{border:1px solid var(--border);background:rgba(13,26,42,.80);border-radius:20px}
+.top{text-align:center;padding:15px 12px;margin-bottom:12px}.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--cyan);text-transform:uppercase}.title{font-size:22px;font-weight:850;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{text-align:center;padding:11px 6px}.k{font-size:10px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase}.v{font-size:22px;font-weight:850;margin-top:3px}
+.boardCard{padding:14px}.board{width:min(100%,430px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:7px;padding:7px;background:rgba(3,8,14,.72);border-radius:18px}
+.cell{position:relative;border-radius:12px;background:#0b1624;border:1px solid rgba(255,255,255,.055);overflow:hidden}.cell.wall{background:linear-gradient(145deg,#2a3b50,#1b2939);border-color:rgba(255,255,255,.12)}
+.goal{position:absolute;inset:18%;border-radius:10px;border:3px dashed var(--goal);opacity:.8}.piece{position:absolute;inset:10%;border-radius:14px;box-shadow:0 0 18px rgba(255,255,255,.16),inset 0 0 18px rgba(255,255,255,.14)}
+.piece.red{background:linear-gradient(145deg,#ff8090,#b53a4e)}.piece.blue{background:linear-gradient(145deg,#75a0ff,#3457bd)}.piece.green{background:linear-gradient(145deg,#6bedaa,#219d63)}.piece::after{content:"";position:absolute;inset:30%;border-radius:50%;background:rgba(255,255,255,.72)}
+.message{text-align:center;color:var(--muted);font-size:14px;min-height:48px;padding:12px 4px 0}.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.btn{border:1px solid var(--border);background:rgba(255,255,255,.045);color:var(--text);border-radius:14px;padding:13px 6px;font-size:20px;font-weight:850;cursor:pointer}.btn:active{transform:scale(.96)}.btn.primary{border-color:rgba(56,211,255,.35);background:linear-gradient(180deg,rgba(56,211,255,.15),rgba(56,211,255,.05))}.spacer{visibility:hidden}
+.utility{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.utility .btn{font-size:13px}.result{display:none;margin-top:12px;padding:16px;text-align:center;border-radius:18px;border:1px solid rgba(89,227,155,.3);background:rgba(89,227,155,.08)}.result.show{display:block}.result h2{margin:0;color:var(--green)}.big{font-size:36px;font-weight:900;margin:5px}.small{font-size:13px;color:var(--muted)}
+.how{padding:15px;margin-top:12px}.how h2{font-size:14px;letter-spacing:.12em;color:var(--cyan);margin:0 0 8px}.how p{font-size:13px;color:var(--muted);line-height:1.5;margin:6px 0}footer{text-align:center;color:#607489;font-size:11px;margin-top:14px}
+</style>
 </head>
-
 <body>
-
-<div>
-<h1>INERTIA</h1>
-
-<p>
-Version 0.1<br><br>
-
-If you can read this...<br>
-our game is officially alive.
-</p>
-
+<div class="app">
+<header><div class="brand"><div class="logo">◆</div><div><h1>INERTIA</h1><div class="tag">SHIFT GRAVITY. SOLVE THE BOARD.</div></div></div></header>
+<section class="top card"><div class="eyebrow">Build 0.2</div><div class="title">First Playable Puzzle</div></section>
+<section class="stats"><div class="stat card"><div class="k">Moves</div><div class="v" id="movesText">0</div></div><div class="stat card"><div class="k">Best</div><div class="v" id="bestText">—</div></div><div class="stat card"><div class="k">Goals</div><div class="v" id="goalsText">0/3</div></div></section>
+<section class="boardCard card"><div class="board" id="board"></div><div class="message" id="messageText">Use gravity to land every cube on a goal.</div></section>
+<section class="controls"><div class="spacer"></div><button class="btn primary" data-dir="up">↑</button><div class="spacer"></div><button class="btn primary" data-dir="left">←</button><button class="btn primary" data-dir="down">↓</button><button class="btn primary" data-dir="right">→</button></section>
+<section class="utility"><button class="btn" id="undoBtn">↶ Undo</button><button class="btn" id="resetBtn">↻ Restart</button></section>
+<section class="result" id="resultBox"><h2>Puzzle solved</h2><div class="big"><span id="finalMoves">0</span> moves</div><div class="small">Tap Restart and try to beat it.</div></section>
+<section class="how card"><h2>HOW TO PLAY</h2><p>Tap a direction. Every cube slides until it hits a wall, the edge, or another cube.</p><p>Put all three cubes onto the three gold goal pads.</p></section>
+<footer>INERTIA Build 0.2 • mobile web prototype</footer>
 </div>
-
+<script>
+"use strict";
+(()=>{
+const SIZE=5, boardEl=document.getElementById("board"), movesText=document.getElementById("movesText"), bestText=document.getElementById("bestText"), goalsText=document.getElementById("goalsText"), messageText=document.getElementById("messageText"), resultBox=document.getElementById("resultBox"), finalMoves=document.getElementById("finalMoves"), undoBtn=document.getElementById("undoBtn");
+const walls=new Set(["1,1","1,3","3,1","3,3"]);
+const goals=[{r:0,c:4},{r:2,c:2},{r:4,c:0}];
+const initialPieces=[{id:"red",color:"red",r:0,c:0},{id:"blue",color:"blue",r:4,c:4},{id:"green",color:"green",r:2,c:0}];
+let pieces=clone(initialPieces),history=[],moves=0,solved=false;
+const bestKey="inertia-build-02-best", savedBest=Number(localStorage.getItem(bestKey)||0);
+bestText.textContent=savedBest?String(savedBest):"—";
+function clone(list){return list.map(p=>({...p}))}
+function key(r,c){return r+","+c}
+function createBoard(){boardEl.innerHTML="";for(let r=0;r<SIZE;r++){for(let c=0;c<SIZE;c++){const cell=document.createElement("div");cell.className="cell";cell.dataset.r=r;cell.dataset.c=c;if(walls.has(key(r,c)))cell.classList.add("wall");if(goals.some(g=>g.r===r&&g.c===c)){const goal=document.createElement("div");goal.className="goal";cell.appendChild(goal)}boardEl.appendChild(cell)}}}
+function render(){document.querySelectorAll(".piece").forEach(el=>el.remove());for(const p of pieces){const cell=boardEl.querySelector(`[data-r="${p.r}"][data-c="${p.c}"]`);const el=document.createElement("div");el.className="piece "+p.color;cell.appendChild(el)}movesText.textContent=String(moves);const onGoals=pieces.filter(p=>goals.some(g=>g.r===p.r&&g.c===p.c)).length;goalsText.textContent=onGoals+"/3";undoBtn.disabled=history.length===0}
+function delta(dir){return{up:[-1,0],down:[1,0],left:[0,-1],right:[0,1]}[dir]}
+function sorted(dir,list){return[...list].sort((a,b)=>dir==="up"?a.r-b.r:dir==="down"?b.r-a.r:dir==="left"?a.c-b.c:b.c-a.c)}
+function compute(dir){const [dr,dc]=delta(dir),next=clone(pieces),order=sorted(dir,next),occupied=new Set(next.map(p=>key(p.r,p.c)));for(const p of order){occupied.delete(key(p.r,p.c));let nr=p.r,nc=p.c;while(true){const tr=nr+dr,tc=nc+dc;if(tr<0||tr>=SIZE||tc<0||tc>=SIZE||walls.has(key(tr,tc))||occupied.has(key(tr,tc)))break;nr=tr;nc=tc}p.r=nr;p.c=nc;occupied.add(key(nr,nc))}return next}
+function same(a,b){return a.every((p,i)=>p.r===b[i].r&&p.c===b[i].c)}
+function move(dir){if(solved)return;const next=compute(dir);if(same(next,pieces)){messageText.textContent="Nothing can move that way.";return}history.push({pieces:clone(pieces),moves});pieces=next;moves++;messageText.textContent="Gravity shifted "+dir+".";render();checkWin()}
+function checkWin(){if(!pieces.every(p=>goals.some(g=>g.r===p.r&&g.c===p.c)))return;solved=true;resultBox.classList.add("show");finalMoves.textContent=String(moves);messageText.textContent="Solved. Can you do it in fewer moves?";const old=Number(localStorage.getItem(bestKey)||0);if(!old||moves<old){localStorage.setItem(bestKey,String(moves));bestText.textContent=String(moves)}if(navigator.vibrate)navigator.vibrate([30,30,30,30,80])}
+function reset(){pieces=clone(initialPieces);history=[];moves=0;solved=false;resultBox.classList.remove("show");messageText.textContent="Use gravity to land every cube on a goal.";render()}
+document.querySelectorAll("[data-dir]").forEach(btn=>btn.addEventListener("click",()=>move(btn.dataset.dir)));
+undoBtn.addEventListener("click",()=>{if(!history.length)return;const prior=history.pop();pieces=clone(prior.pieces);moves=prior.moves;solved=false;resultBox.classList.remove("show");messageText.textContent="Move undone.";render()});
+document.getElementById("resetBtn").addEventListener("click",reset);
+createBoard();render();
+})();
+</script>
 </body>
 </html>
