@@ -1,0 +1,130 @@
+:root{
+  --bg:#07101c;
+  --panel:#0d1a2a;
+  --text:#f4f8fb;
+  --muted:#9fb0c2;
+  --cyan:#38d3ff;
+  --green:#59e39b;
+  --gold:#f7d56b;
+  --border:rgba(255,255,255,.10);
+  --cell-gap:7px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  display:flex;
+  justify-content:center;
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 50% 8%,rgba(56,211,255,.10),transparent 28%),
+    linear-gradient(180deg,#07101c,#040810 88%);
+}
+button{font:inherit}
+.app{
+  width:min(100%,520px);
+  padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{
+  width:46px;height:46px;border-radius:14px;
+  display:grid;place-items:center;
+  border:1px solid rgba(56,211,255,.42);
+  background:linear-gradient(145deg,rgba(56,211,255,.15),rgba(92,141,255,.10));
+  font-size:23px;
+}
+h1{margin:0;font-size:25px;letter-spacing:.2em}
+header p{margin:3px 0 0;color:var(--muted);font-size:11px;letter-spacing:.11em}
+.card{
+  border:1px solid var(--border);
+  background:rgba(13,26,42,.82);
+  border-radius:20px;
+}
+.level-card{text-align:center;padding:15px 12px;margin-bottom:12px}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--cyan)}
+.level-card h2{margin:4px 0 2px;font-size:22px}
+.lesson{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{text-align:center;padding:11px 6px}
+.stat span{display:block;color:var(--muted);font-size:10px;letter-spacing:.13em}
+.stat strong{display:block;font-size:22px;margin-top:3px}
+.board-card{padding:14px}
+.board{
+  --size:5;
+  position:relative;
+  width:min(100%,430px);
+  aspect-ratio:1;
+  margin:0 auto;
+  padding:7px;
+  border-radius:18px;
+  background:#050c15;
+  overflow:hidden;
+}
+.floor-grid{
+  position:absolute;
+  inset:7px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5,1fr);
+  gap:var(--cell-gap);
+}
+.cell{
+  position:relative;
+  border-radius:12px;
+  background:#0b1624;
+  border:1px solid rgba(255,255,255,.055);
+}
+.cell.wall{
+  background:linear-gradient(145deg,#2a3b50,#1b2939);
+  border-color:rgba(255,255,255,.13);
+}
+.goal{
+  position:absolute;
+  inset:19%;
+  border:3px dashed var(--gold);
+  border-radius:10px;
+  box-shadow:0 0 15px rgba(247,213,107,.20);
+}
+.piece-layer{position:absolute;inset:7px;pointer-events:none}
+.piece{
+  position:absolute;
+  width:calc((100% - (4 * var(--cell-gap))) / 5);
+  height:calc((100% - (4 * var(--cell-gap))) / 5);
+  padding:7px;
+  transition:left .27s cubic-bezier(.18,.75,.2,1),top .27s cubic-bezier(.18,.75,.2,1);
+}
+.cube{
+  width:100%;height:100%;border-radius:14px;
+  box-shadow:0 0 18px rgba(255,255,255,.14),inset 0 0 18px rgba(255,255,255,.16);
+  position:relative;
+}
+.cube::after{
+  content:"";position:absolute;inset:31%;border-radius:50%;background:rgba(255,255,255,.76);
+}
+.red .cube{background:linear-gradient(145deg,#ff8090,#b53a4e)}
+.blue .cube{background:linear-gradient(145deg,#75a0ff,#3457bd)}
+.green .cube{background:linear-gradient(145deg,#6bedaa,#219d63)}
+.message{text-align:center;color:var(--muted);font-size:14px;min-height:48px;padding:12px 4px 0}
+.gravity-controls{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px
+}
+.gravity-controls button,.utility-controls button,.win-panel button{
+  border:1px solid rgba(56,211,255,.34);
+  background:linear-gradient(180deg,rgba(56,211,255,.15),rgba(56,211,255,.05));
+  color:var(--text);border-radius:14px;padding:13px 6px;
+  font-size:21px;font-weight:850;
+  -webkit-tap-highlight-color:transparent;
+}
+.gravity-controls button:active,.utility-controls button:active,.win-panel button:active{transform:scale(.96)}
+.gravity-controls button:disabled,.utility-controls button:disabled{opacity:.35}
+.utility-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.utility-controls button{font-size:13px;border-color:var(--border);background:rgba(255,255,255,.045)}
+.win-panel{text-align:center;padding:17px;margin-top:12px;border-color:rgba(89,227,155,.30);background:rgba(89,227,155,.08)}
+.win-panel h2{margin:0;color:var(--green)}
+.score{font-size:36px;font-weight:900;margin:5px}
+.win-panel p{color:var(--muted);font-size:13px}
+.win-panel button{font-size:14px;width:100%}
+.instructions{padding:15px;margin-top:12px}
+.instructions h3{font-size:14px;letter-spacing:.12em;color:var(--cyan);margin:0 0 8px}
+.instructions p{font-size:13px;color:var(--muted);line-height:1.5;margin:6px 0}
+footer{text-align:center;color:#607489;font-size:11px;margin-top:14px}
