@@ -1,1 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07101c">
+<title>INERTIA</title>
+<style>
+:root{
+  --bg:#07101c;--panel:#0d1a2a;--text:#f4f8fb;--muted:#9fb0c2;
+  --cyan:#38d3ff;--green:#59e39b;--gold:#f7d56b;--border:rgba(255,255,255,.10);
+  --gap:7px
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  display:flex;justify-content:center;color:var(--text);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:radial-gradient(circle at 50% 7%,rgba(56,211,255,.11),transparent 28%),
+  linear-gradient(180deg,#07101c,#040810 88%)
+}
+button{font:inherit}
+.app{width:min(100%,520px);padding:18px 16px calc(24px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{
+  width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+  border:1px solid rgba(56,211,255,.42);
+  background:linear-gradient(145deg,rgba(56,211,255,.15),rgba(92,141,255,.10));
+  font-size:23px
+}
+h1{margin:0;font-size:25px;letter-spacing:.2em}
+header p{margin:3px 0 0;color:var(--muted);font-size:11px;letter-spacing:.11em}
+.card{border:1px solid var(--border);background:rgba(13,26,42,.83);border-radius:20px}
+.level-card{text-align:center;padding:15px 12px;margin-bottom:12px}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--cyan)}
+.level-card h2{margin:4px 0 3px;font-size:22px}
+.lesson{color:var(--muted);font-size:13px;min-height:19px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{text-align:center;padding:11px 6px}
+.stat span{display:block;color:var(--muted);font-size:10px;letter-spacing:.13em}
+.stat strong{display:block;font-size:22px;margin-top:3px}
+.board-card{padding:14px}
+.board{
+  position:relative;width:min(100%,430px);aspect-ratio:1;margin:0 auto;padding:7px;
+  border-radius:18px;background:#050c15;overflow:hidden
+}
+.floor-grid{
+  position:absolute;inset:7px;display:grid;
+  grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:var(--gap)
+}
+.cell{position:relative;border-radius:12px;background:#0b1624;border:1px solid rgba(255,255,255,.055)}
+.cell.wall{background:linear-gradient(145deg,#2a3b50,#1b2939);border-color:rgba(255,255,255,.13)}
+.goal{
+  position:absolute;inset:19%;border:3px dashed var(--gold);border-radius:10px;
+  box-shadow:0 0 15px rgba(247,213,107,.22)
+}
+.piece-layer{position:absolute;inset:7px;pointer-events:none}
+.piece{
+  position:absolute;width:calc((100% - 28px)/5);height:calc((100% - 28px)/5);
+  padding:7px;transition:left .27s cubic-bezier(.18,.75,.2,1),top .27s cubic-bezier(.18,.75,.2,1)
+}
+.cube{
+  width:100%;height:100%;border-radius:14px;position:relative;
+  box-shadow:0 0 18px rgba(255,255,255,.14),inset 0 0 18px rgba(255,255,255,.16)
+}
+.cube::after{content:"";position:absolute;inset:31%;border-radius:50%;background:rgba(255,255,255,.77)}
+.red .cube{background:linear-gradient(145deg,#ff8090,#b53a4e)}
+.blue .cube{background:linear-gradient(145deg,#75a0ff,#3457bd)}
+.green .cube{background:linear-gradient(145deg,#6bedaa,#219d63)}
+.message{text-align:center;color:var(--muted);font-size:14px;min-height:48px;padding:12px 4px 0}
+.gravity-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.gravity-controls button,.utility button,.win-panel button{
+  border:1px solid rgba(56,211,255,.34);
+  background:linear-gradient(180deg,rgba(56,211,255,.15),rgba(56,211,255,.05));
+  color:var(--text);border-radius:14px;padding:13px 6px;font-size:21px;font-weight:850;
+  -webkit-tap-highlight-color:transparent
+}
+.gravity-controls button:active,.utility button:active,.win-panel button:active{transform:scale(.96)}
+.gravity-controls button:disabled,.utility button:disabled{opacity:.35}
+.utility,.level-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.utility button,.level-nav button{font-size:13px;border-color:var(--border);background:rgba(255,255,255,.045)}
+.level-nav button{
+  color:var(--text);border-radius:14px;padding:12px 6px;font-weight:750;
+  border:1px solid var(--border);-webkit-tap-highlight-color:transparent
+}
+.level-nav button:disabled{opacity:.35}
+.win-panel{
+  text-align:center;padding:17px;margin-top:12px;border-color:rgba(89,227,155,.30);
+  background:rgba(89,227,155,.08)
+}
+.win-panel h2{margin:0;color:var(--green)}
+.score{font-size:36px;font-weight:900;margin:5px}
+.win-panel p{color:var(--muted);font-size:13px}
+.discovery{color:var(--gold)!important;font-weight:800}
+.win-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.win-panel button{font-size:14px}
+.progress-dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
+.progress-dots span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.13)}
+.progress-dots span.done{background:var(--green)}
+.progress-dots span.current{background:var(--cyan);box-shadow:0 0 10px rgba(56,211,255,.65)}
+.instructions{padding:15px;margin-top:12px}
+.instructions h3{font-size:14px;letter-spacing:.12em;color:var(--cyan);margin:0 0 8px}
+.instructions p{font-size:13px;color:var(--muted);line-height:1.5;margin:6px 0}
+footer{text-align:center;color:#607489;font-size:11px;margin-top:14px}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+  <div class="logo">◆</div>
+  <div><h1>INERTIA</h1><p>SHIFT GRAVITY. SOLVE THE BOARD.</p></div>
+</header>
 
+<section class="card level-card">
+  <div class="eyebrow">BUILD 0.5 · PUZZLE ENGINE</div>
+  <h2 id="level-title"></h2>
+  <div id="lesson" class="lesson"></div>
+  <div id="progress" class="progress-dots"></div>
+</section>
+
+<section class="stats">
+  <div class="card stat"><span>PUZZLE</span><strong id="level-number"></strong></div>
+  <div class="card stat"><span>MOVES</span><strong id="move-count">0</strong></div>
+  <div class="card stat"><span>PAR</span><strong id="par-count"></strong></div>
+</section>
+
+<section class="card board-card">
+  <div id="board" class="board"></div>
+  <div id="message" class="message"></div>
+</section>
+
+<section class="gravity-controls">
+  <span></span><button data-dir="U">↑</button><span></span>
+  <button data-dir="L">←</button><button data-dir="D">↓</button><button data-dir="R">→</button>
+</section>
+
+<section class="utility">
+  <button id="undo">↶ Undo</button>
+  <button id="restart">↻ Restart</button>
+</section>
+
+<section class="level-nav">
+  <button id="previous-level">← Previous</button>
+  <button id="browse-next">Next →</button>
+</section>
+
+<section id="win-panel" class="card win-panel" hidden>
+  <h2>Nice!</h2>
+  <div class="score"><span id="final-moves">0</span> moves</div>
+  <p id="score-message"></p>
+  <p id="discovery" class="discovery"></p>
+  <div class="win-actions">
+    <button id="replay">▶ Replay</button>
+    <button id="next-level">Next →</button>
+  </div>
+</section>
+
+<section class="card instructions">
+  <h3>PUZZLE ENGINE</h3>
+  <p>Puzzles now load from structured level data rather than separate game code.</p>
+  <p>Use Previous and Next to revisit any puzzle. Your best score is stored on this phone.</p>
+</section>
+
+<footer>INERTIA Build 0.5</footer>
+</main>
+
+<script>
+"use strict";
+(() => {
+  const SIZE=5;
+  const LEVELS=[
+    {
+      title:"First Motion", intro:"One cube. One goal.", par:1,
+      discovery:"You discovered: cubes slide until stopped.",
+      walls:[], goals:[[2,4]], pieces:[{id:"red",color:"red",r:2,c:0}]
+    },
+    {
+      title:"The Stop", intro:"Use the wall.", par:1,
+      discovery:"You discovered: walls can place a cube precisely.",
+      walls:[[0,3]], goals:[[0,2]], pieces:[{id:"red",color:"red",r:0,c:0}]
+    },
+    {
+      title:"Friendly Blocker", intro:"Two cubes can help each other.", par:4,
+      discovery:"You discovered: one cube can become another cube's wall.",
+      walls:[[2,0]], goals:[[0,0],[3,0]],
+      pieces:[{id:"red",color:"red",r:2,c:4},{id:"blue",color:"blue",r:0,c:3}]
+    },
+    {
+      title:"Move Away First", intro:"The direct route is not always the right route.", par:5,
+      discovery:"You discovered: sometimes progress begins by moving away.",
+      walls:[[2,2],[4,0],[4,1]], goals:[[3,1],[4,4]],
+      pieces:[{id:"red",color:"red",r:4,c:2},{id:"blue",color:"blue",r:0,c:4}]
+    },
+    {
+      title:"Order Matters", intro:"Everything you have learned, together.", par:8,
+      discovery:"You discovered: the right order turns cubes into tools.",
+      walls:[[0,1],[1,2],[0,4],[4,3]], goals:[[4,4],[4,0],[3,3]],
+      pieces:[
+        {id:"red",color:"red",r:0,c:3},
+        {id:"blue",color:"blue",r:2,c:4},
+        {id:"green",color:"green",r:2,c:2}
+      ]
+    }
+  ];
+
+  const board=document.getElementById("board");
+  const title=document.getElementById("level-title");
+  const lesson=document.getElementById("lesson");
+  const levelNumber=document.getElementById("level-number");
+  const moveCount=document.getElementById("move-count");
+  const parCount=document.getElementById("par-count");
+  const message=document.getElementById("message");
+  const progress=document.getElementById("progress");
+  const undoBtn=document.getElementById("undo");
+  const restartBtn=document.getElementById("restart");
+  const winPanel=document.getElementById("win-panel");
+  const finalMoves=document.getElementById("final-moves");
+  const scoreMessage=document.getElementById("score-message");
+  const discovery=document.getElementById("discovery");
+  const replayBtn=document.getElementById("replay");
+  const nextBtn=document.getElementById("next-level");
+  const previousLevelBtn=document.getElementById("previous-level");
+  const browseNextBtn=document.getElementById("browse-next");
+
+  const DIR={U:[-1,0],D:[1,0],L:[0,-1],R:[0,1]};
+  let levelIndex=Math.min(Number(localStorage.getItem("inertia05-level")||0),LEVELS.length-1);
+  let level,pieces,walls,goals,history,moves,solved,locked,solutionMoves,solvedState;
+
+  const key=(r,c)=>`${r},${c}`;
+  const clone=list=>list.map(x=>({...x}));
+
+  function loadLevel(index){
+    levelIndex=index;
+    level=LEVELS[index];
+    pieces=clone(level.pieces);
+    walls=new Set(level.walls.map(([r,c])=>key(r,c)));
+    goals=level.goals.map(([r,c])=>({r,c}));
+    history=[];moves=0;solved=false;locked=false;solutionMoves=[];solvedState=null;
+    winPanel.hidden=true;
+
+    title.textContent=level.title;
+    const savedBest=Number(localStorage.getItem("inertia05-best-"+levelIndex)||0);
+    lesson.textContent=savedBest ? level.intro+"  Best: "+savedBest : level.intro;
+    levelNumber.textContent=`${index+1}/${LEVELS.length}`;
+    parCount.textContent=String(level.par);
+    message.textContent=index===0?"Tap right to begin.":"Land every cube on a gold goal.";
+    localStorage.setItem("inertia05-level",String(index));
+    buildBoard();render(false);renderProgress();updateControls();
+  }
+
+  function renderProgress(){
+    progress.innerHTML="";
+    LEVELS.forEach((_,i)=>{
+      const dot=document.createElement("span");
+      if(i<levelIndex)dot.classList.add("done");
+      if(i===levelIndex)dot.classList.add("current");
+      progress.appendChild(dot);
+    });
+  }
+
+  function buildBoard(){
+    board.innerHTML="";
+    const floor=document.createElement("div");floor.className="floor-grid";
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        const cell=document.createElement("div");cell.className="cell";
+        if(walls.has(key(r,c)))cell.classList.add("wall");
+        if(goals.some(g=>g.r===r&&g.c===c)){
+          const goal=document.createElement("div");goal.className="goal";cell.appendChild(goal);
+        }
+        floor.appendChild(cell);
+      }
+    }
+    const layer=document.createElement("div");layer.className="piece-layer";layer.id="piece-layer";
+    board.append(floor,layer);
+  }
+
+  function position(r,c){
+    return{
+      left:`calc(${c} * ((100% - 28px)/5 + 7px))`,
+      top:`calc(${r} * ((100% - 28px)/5 + 7px))`
+    };
+  }
+
+  function render(animate=true){
+    const layer=document.getElementById("piece-layer");
+    for(const piece of pieces){
+      let el=layer.querySelector(`[data-id="${piece.id}"]`);
+      if(!el){
+        el=document.createElement("div");el.className=`piece ${piece.color}`;el.dataset.id=piece.id;
+        el.innerHTML='<div class="cube"></div>';
+        if(!animate)el.style.transition="none";
+        layer.appendChild(el);
+      }
+      const p=position(piece.r,piece.c);el.style.left=p.left;el.style.top=p.top;
+      if(!animate)requestAnimationFrame(()=>el.style.transition="");
+    }
+    moveCount.textContent=String(moves);
+  }
+
+  function sorted(dir,list){
+    return[...list].sort((a,b)=>{
+      if(dir==="U")return a.r-b.r;if(dir==="D")return b.r-a.r;
+      if(dir==="L")return a.c-b.c;return b.c-a.c;
+    });
+  }
+
+  function calculate(dir,source=pieces){
+    const [dr,dc]=DIR[dir],next=clone(source),order=sorted(dir,next);
+    const occupied=new Set(next.map(p=>key(p.r,p.c)));
+    for(const p of order){
+      occupied.delete(key(p.r,p.c));
+      let r=p.r,c=p.c;
+      while(true){
+        const nr=r+dr,nc=c+dc;
+        if(nr<0||nr>=SIZE||nc<0||nc>=SIZE||walls.has(key(nr,nc))||occupied.has(key(nr,nc)))break;
+        r=nr;c=nc;
+      }
+      p.r=r;p.c=c;occupied.add(key(r,c));
+    }
+    return next;
+  }
+
+  function same(a,b){return a.every((p,i)=>p.r===b[i].r&&p.c===b[i].c)}
+
+  function shift(dir,record=true){
+    if(locked||solved)return;
+    const next=calculate(dir);
+    if(same(next,pieces)){message.textContent="Nothing can move that way.";return}
+    if(record){
+      history.push({pieces:clone(pieces),moves,solutionMoves:[...solutionMoves]});
+      solutionMoves.push(dir);moves++;
+    }
+    pieces=next;locked=true;render(true);updateControls();
+    if(navigator.vibrate&&record)navigator.vibrate(8);
+    setTimeout(()=>{locked=false;updateControls();checkWin();},290);
+  }
+
+  function isWon(){return pieces.every(p=>goals.some(g=>g.r===p.r&&g.c===p.c))}
+
+  function checkWin(){
+    if(!isWon()){message.textContent="Keep planning.";return}
+    solved=true;solvedState=clone(pieces);message.textContent="Solved.";
+    finalMoves.textContent=String(moves);
+    scoreMessage.textContent=moves===level.par?"Perfect — you matched par.":moves<level.par?"You beat par!":`${moves-level.par} move(s) over par.`;
+    discovery.textContent=level.discovery;
+    const bestKey="inertia05-best-"+levelIndex;
+    const oldBest=Number(localStorage.getItem(bestKey)||0);
+    if(!oldBest||moves<oldBest)localStorage.setItem(bestKey,String(moves));
+    lesson.textContent=level.intro+"  Best: "+Math.min(oldBest||moves,moves);
+    nextBtn.textContent=levelIndex===LEVELS.length-1?"Play Again":"Next →";
+    updateControls();
+    setTimeout(()=>replaySolution(true),650);
+  }
+
+  function replaySolution(auto=false){
+    if(!solved||locked)return;
+    winPanel.hidden=true;locked=true;
+    const sequence=[...solutionMoves];
+    pieces=clone(level.pieces);render(true);message.textContent="Replaying your solution…";
+    let i=0;
+    const step=()=>{
+      if(i>=sequence.length){
+        setTimeout(()=>{
+          pieces=clone(solvedState);render(true);locked=false;winPanel.hidden=false;
+          message.textContent="That was your solution.";updateControls();
+        },350);
+        return;
+      }
+      pieces=calculate(sequence[i],pieces);render(true);i++;
+      setTimeout(step,380);
+    };
+    setTimeout(step,320);
+  }
+
+  function undo(){
+    if(!history.length||locked)return;
+    const prev=history.pop();pieces=clone(prev.pieces);moves=prev.moves;solutionMoves=[...prev.solutionMoves];
+    solved=false;winPanel.hidden=true;message.textContent="Move undone.";render(true);updateControls();
+  }
+
+  function restart(){loadLevel(levelIndex)}
+  function previousLevel(){if(levelIndex>0)loadLevel(levelIndex-1)}
+  function browseNext(){if(levelIndex<LEVELS.length-1)loadLevel(levelIndex+1)}
+  function next(){
+    const index=levelIndex===LEVELS.length-1?0:levelIndex+1;
+    loadLevel(index);
+  }
+
+  function updateControls(){
+    document.querySelectorAll("[data-dir]").forEach(b=>b.disabled=locked||solved);
+    undoBtn.disabled=locked||history.length===0;
+    restartBtn.disabled=locked;
+    previousLevelBtn.disabled=locked||levelIndex===0;
+    browseNextBtn.disabled=locked||levelIndex===LEVELS.length-1;
+  }
+
+  document.querySelectorAll("[data-dir]").forEach(b=>b.addEventListener("click",()=>shift(b.dataset.dir)));
+  undoBtn.addEventListener("click",undo);
+  restartBtn.addEventListener("click",restart);
+  replayBtn.addEventListener("click",()=>replaySolution(false));
+  nextBtn.addEventListener("click",next);
+  previousLevelBtn.addEventListener("click",previousLevel);
+  browseNextBtn.addEventListener("click",browseNext);
+
+  loadLevel(levelIndex);
+})();
+</script>
+</body>
+</html>
